@@ -7,7 +7,7 @@ import sys
 import os
 import argparse
 import logging
-from logging.handlers import RotatingFileHandler
+from concurrent_log_handler import ConcurrentRotatingFileHandler
 import pickle
 import json
 import time
@@ -35,6 +35,7 @@ INPUT_FILE_PREFIX = ''
 LOGFILE_LOCATION = '/var/log/telegraf/'
 LOGFILE_SIZE = 20000000
 LOGFILE_NUMBER = 10
+LOGFILE_GZIP = True
 logger = logging.getLogger('UTM')
 
 # Dictionary with key as IP and value as list of user and passwd
@@ -200,8 +201,8 @@ def setup_logging():
         logfile_prefix = FILENAME_PREFIX
     finally:
         logfile_name = logfile_prefix + '_' + INPUT_FILE_PREFIX + '.log'
-        rotator = RotatingFileHandler(logfile_name, maxBytes=LOGFILE_SIZE,
-                                      backupCount=LOGFILE_NUMBER)
+        rotator = ConcurrentRotatingFileHandler(logfile_name, maxBytes=LOGFILE_SIZE,
+                                      backupCount=LOGFILE_NUMBER, use_gzip=LOGFILE_GZIP)
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         rotator.setFormatter(formatter)
         logger.addHandler(rotator)
